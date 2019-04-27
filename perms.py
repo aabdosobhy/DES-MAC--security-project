@@ -106,3 +106,6 @@ PI_1 = [40, 8, 48, 16, 56, 24, 64, 32,
 
 #Matrix that determine the shift for each round of keys
 SHIFT = [1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1]
+
+# MAC encryption key
+keyMAC = "0E329232EA6D0D73"

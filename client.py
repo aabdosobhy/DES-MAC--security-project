@@ -1,6 +1,17 @@
 import socket
+from perms import keyMAC
 
-blockSize=64
+blockSize = 64
+
+# MAC sender data processing
+def sendMAC(msg):
+    # encrypt msg with keyMAC
+    encryptMACkey=""
+    # hash msg with keyMAC
+    hashedMAC = hash(encryptMACkey)
+    return hashedMAC
+    
+
 
 # Read plain text from user and sent it to client
 def sendMsg(sock):

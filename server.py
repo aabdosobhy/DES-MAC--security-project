@@ -1,6 +1,19 @@
 import socket
+from perms import keyMAC
 
 blockSize=64
+
+# MAC receiver data processing
+def recvMAC(msg):
+    # encrypt msg with keyMAC
+    encryptMACkey=""
+    # hash msg with keyMAC
+    hashedMAC = hash(encryptMACkey)
+    return hashedMAC
+
+def checkMAC(msg, MAC):
+    calcMAC = recvMAC(msg)
+    return calcMAC == MAC
 
 def createConn(prtNum=50000):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,8 +27,14 @@ def createConn(prtNum=50000):
         #conn.sendall(data)
         strn = data.decode("utf-8") 
     conn.close()
-    return strn
+    MAC = ""
+    return strn,MAC
 
-cipheredMsg = createConn()
+cipheredMsg, MAC = createConn()
 # Display the Encypted Data
 print(cipheredMsg)
+# Decrypt the recieved msg
+decryptedMsg = ""
+print(decryptedMsg)
+# Check for the MAC
+checkMAC(decryptedMsg, MAC)
