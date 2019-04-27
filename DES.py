@@ -56,13 +56,13 @@ class desModes():
        
         return result
     
-    def des_CFB():
+    def des_CFB(self):
         # TODO
         return
-    def des_OFB():
+    def des_OFB(self):
         # TODO
         return
-    def des_CNT():
+    def des_CNT(self):
         # TODO
         return
         
