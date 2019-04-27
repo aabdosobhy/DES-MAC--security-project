@@ -1,5 +1,6 @@
 import socket
-from perms import keyMAC
+from keys import keyMAC
+from DES import desModes
 
 blockSize=64
 
@@ -14,23 +15,25 @@ def recvMAC(msg):
 def checkMAC(msg, MAC):
     calcMAC = recvMAC(msg)
     return calcMAC == MAC
+class server():
 
-def createConn(prtNum=50000):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('localhost', prtNum))
-    s.listen(1)
-    conn, addr = s.accept()
-    while 1:
-        data = conn.recv(blockSize)
-        if not data:
-            break
-        #conn.sendall(data)
-        strn = data.decode("utf-8") 
-    conn.close()
-    MAC = ""
-    return strn,MAC
+    def createConn(self, prtNum=50000):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(('localhost', prtNum))
+        s.listen(1)
+        conn, addr = s.accept()
+        while 1:
+            data = conn.recv(blockSize)
+            if not data:
+                break
+            #conn.sendall(data)
+            strn = data.decode("utf-8") 
+        conn.close()
+        MAC = ""
+        return strn,MAC
 
-cipheredMsg, MAC = createConn()
+serv = server()
+cipheredMsg, MAC = serv.createConn()
 # Display the Encypted Data
 print(cipheredMsg)
 # Decrypt the recieved msg
