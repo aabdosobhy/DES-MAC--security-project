@@ -1,12 +1,25 @@
 from Crypto.Cipher import DES
+from keys import keyMAC,keyDES
+import hashlib
 #from des import DesKey
 
 blockSize = 64
+blockMAC = 8
+# MAC sender data processing
+def sendMAC(msg):
+    obj=DES.new(keyMAC, DES.MODE_ECB)
+    padLen = blockMAC - (len(msg) % blockMAC)
+    msg += padLen * 'X'
+    # encrypt msg with keyMAC
+    encryptMACkey=obj.encrypt(msg)
+    # hash msg with keyMAC
+    hashedMAC = hashlib.md5(encryptMACkey).hexdigest()
+    return str(hashedMAC)
 
 class desModes():
     def __init__(self):
         # For testing purposes
-        self.key = "0E329232EA6D0D73"
+        self.key = keyDES
         #self.key = DesKey(b"some key")
     
     #Split a list into sublists of size blocksize

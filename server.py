@@ -1,19 +1,12 @@
 import socket
 from keys import keyMAC
-from DES import desModes
+from DES import desModes, sendMAC
 
 blockSize=64
 
-# MAC receiver data processing
-def recvMAC(msg):
-    # encrypt msg with keyMAC
-    encryptMACkey=""
-    # hash msg with keyMAC
-    hashedMAC = hash(encryptMACkey)
-    return hashedMAC
-
 def checkMAC(msg, MAC):
-    calcMAC = recvMAC(msg)
+    calcMAC = sendMAC(msg)
+    print(calcMAC+' '+ MAC)
     return calcMAC == MAC
 class server():
 
@@ -29,15 +22,21 @@ class server():
             #conn.sendall(data)
             strn = data.decode("utf-8") 
         conn.close()
-        MAC = ""
-        return strn,MAC
+        # MAC = ""
+        return strn
 
 serv = server()
-cipheredMsg, MAC = serv.createConn()
+cipheredMsg = serv.createConn()
 # Display the Encypted Data
 print(cipheredMsg)
+receieved = cipheredMsg.split(" ")
+MAC = receieved[1]
 # Decrypt the recieved msg
-decryptedMsg = ""
+decryptedMsg = "Hallo"
 print(decryptedMsg)
+sendMAC(decryptedMsg)
 # Check for the MAC
-checkMAC(decryptedMsg, MAC)
+if checkMAC(decryptedMsg, MAC):
+    print("Message is Authenticated")
+else:
+    print("Message is NOT Authenticated.\n 3yate")
