@@ -14,7 +14,7 @@ def sendMAC(msg):
     encryptMACkey=obj.encrypt(msg)
     # hash msg with keyMAC
     hashedMAC = hashlib.md5(encryptMACkey).hexdigest()
-    return str(hashedMAC)
+    return hashedMAC
 
 class desModes():
     def __init__(self):
@@ -55,27 +55,27 @@ class desModes():
         return [x^y for x,y in zip(t1,t2)]
         
     def desECB_Enc(self, plainText):
-        result=""
+        result=b""
         desECB=DES.new(self.key, DES.MODE_ECB)   
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
             if len(block) < blockSize:
                 block = self.padBlock(block)
             ciph=desECB.encrypt(block)
-            result+=str(ciph)
-        return str(result)
+            result+=ciph
+        return result
 
     def desECB_Dec(self, plainText):
-        result = list()
+        result = b''
         desECB=DES.new(self.key, DES.MODE_ECB)   
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
-            if len(block) < blockSize:
-                block = self.padBlock(block)
+            # if len(block) < blockSize:
+            #     block = self.padBlock(block)
             dciph=desECB.decrypt(block)
-            result.append(dciph)
+            result+=dciph
         # print(desECB.decrypt(plainText))
-        return str(result)
+        return result
        
 
     def desCBC_Enc(self, plainText, IV):

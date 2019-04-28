@@ -2,7 +2,7 @@ import socket
 from DES import desModes,sendMAC
 from Crypto.Cipher import DES
 
-blockSize = 64
+blockSize = 8
     
 
 class client():
@@ -17,8 +17,8 @@ class client():
         msg = input("Type the message you want to send\n")
         return msg
     def sendMsg(self,msg):
-        msg = str(msg)
-        self.s.sendall(msg.encode())
+        #msg = str(msg)
+        self.s.sendall(msg)
         return 
 
     def connectToPort(self, portNum=50000):
@@ -40,6 +40,7 @@ encryptedData = des.desECB_Enc(plainMsg)
 # Display MAC data
 dataMAC = sendMAC(str(plainMsg))
 print("MAC to be sent  "+dataMAC)
-clien.sendMsg(encryptedData+ ' '+ dataMAC)
+
+clien.sendMsg(encryptedData)#+ b' '+ dataMAC.encode("utf-8"))
 # Display the Encypted Data
-print("Message after encryption  "+encryptedData)
+print("Message after encryption  "+str(encryptedData))
