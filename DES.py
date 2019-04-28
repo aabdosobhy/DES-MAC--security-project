@@ -31,17 +31,28 @@ class desModes():
         block += padLen * chr(padLen)
         return block
     
-    def stringToBits(text):#Convert a string into a list of bits
+    def stringToBits(self, text):#Convert a string into a list of bits
         array = list()
         for char in text:
-            binval = binvalue(char, 8)#Get the char value on one byte
+            binval = self.binvalue(char, 8)#Get the char value on one byte
             array.extend([int(x) for x in list(binval)]) #Add the bits to the final list
         return array
 
-    def bitsToString(array): #Recreate the string from the bit array
+    def bitsToString(self, array): #Recreate the string from the bit array
         res = ''.join([chr(int(y,2)) for y in 
-            [''.join([str(x) for x in _bytes]) for _bytes in  nsplit(array,8)]])   
+            [''.join([str(x) for x in _bytes]) for _bytes in  self.splitMessage(array)]])   
         return res
+    
+    def binvalue(self, val, bitsize): #Return the binary value as a string of the given size 
+        binval = bin(val)[2:] if isinstance(val, int) else bin(ord(val))[2:]
+        if len(binval) > bitsize:
+            raise "binary value larger than the expected size"
+        while len(binval) < bitsize:
+            binval = "0"+binval #Add as many 0 as needed to get the wanted size
+        return binval
+    
+    def xor(self, t1, t2):#Apply a xor and return the resulting list
+        return [x^y for x,y in zip(t1,t2)]
         
     def desECB_Enc(self, plainText):
         result = list()
@@ -49,6 +60,7 @@ class desModes():
         desECB=DES.new(self.key, DES.MODE_ECB)   
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
+            block = self.stringToBits(block)#Convert the block in bit array
             if len(block) < blockSize:
                 block = self.padBlock(block)
             ciph=desECB.encrypt(block)
@@ -89,7 +101,7 @@ class desModes():
         result = list()
         desECB=DES.new(self.key, DES.MODE_ECB)        
         textBlocks = self.splitMessage(plainText)
-        for i in range (0 , len(textBlocks))
+        for i in range (0 , len(textBlocks) ):
         #for block in textBlocks: #Loop over all the blocks of data
             block = textBlocks[i]
             if len(block) < blockSize:
@@ -175,14 +187,4 @@ class desModes():
             result.append(dciph)
             count+=1
         return result 
-        
-'''       
-if __name__ == '__main__':
-    key = "secret_k"
-    text= "Hello wolldldldxxxx"
-    d = des()
-    r = d.encrypt(key,text, True)
-    r2 = d.decrypt(key, r, True)
-    print("Ciphered: %r" % r)
-    print("Deciphered: ", r2)
-'''
+

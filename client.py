@@ -31,13 +31,15 @@ class client():
 
 
 clien = client()
+des = desModes()
 #clien.connectToPort()
 plainMsg = clien.getMsg()
 # Display plaintext msg inputed from user
 print("Message taken from user  "+plainMsg)
+encryptedData = des.desECB_Enc(plainMsg)
+# Display MAC data
 dataMAC = sendMAC(str(plainMsg))
 print("MAC to be sent  "+dataMAC)
-encryptedData = "Hallo"
 clien.sendMsg(encryptedData+ ' '+ dataMAC)
 # Display the Encypted Data
 print("Message after encryption  "+encryptedData)

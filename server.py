@@ -25,14 +25,21 @@ class server():
         # MAC = ""
         return strn
 
+
 serv = server()
+des = desModes()
 cipheredMsg = serv.createConn()
 # Display the Encypted Data
 print(cipheredMsg)
 receieved = cipheredMsg.split(" ")
-MAC = receieved[1]
+
+try:
+    MAC = receieved[1]
+except:
+    print("Wrong message format")
+msg = receieved[0]
 # Decrypt the recieved msg
-decryptedMsg = "Hallo"
+decryptedMsg = des.desECB_Dec(msg)
 print(decryptedMsg)
 sendMAC(decryptedMsg)
 # Check for the MAC
