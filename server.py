@@ -36,13 +36,12 @@ try:
 except:
     print("Wrong message format")
 msg = receieved[0]
-msg= msg[2:-1]
 # Display the Encypted Data
 print("Recieved encyprted message  "+msg)
 # Decrypt the recieved msg
 decryptedMsg = des.desECB_Dec(msg)
 #print(decryptedMsg)
-print("Decrypted message \n")
+print("\nDecrypted message \n")
 print(decryptedMsg)
 sendMAC(decryptedMsg)
 # Check for the MAC

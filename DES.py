@@ -3,7 +3,7 @@ from keys import keyMAC,keyDES
 import hashlib
 #from des import DesKey
 
-blockSize = 64
+blockSize = 8
 blockMAC = 8
 # MAC sender data processing
 def sendMAC(msg):
@@ -55,17 +55,14 @@ class desModes():
         return [x^y for x,y in zip(t1,t2)]
         
     def desECB_Enc(self, plainText):
-        result = list()
-        #plainText = self.stringToBits(plainText)
+        result=""
         desECB=DES.new(self.key, DES.MODE_ECB)   
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
-            #block = self.stringToBits(block)#Convert the block in bit array
-            print(block)
             if len(block) < blockSize:
                 block = self.padBlock(block)
             ciph=desECB.encrypt(block)
-            result.append(ciph)
+            result+=str(ciph)
         return str(result)
 
     def desECB_Dec(self, plainText):
@@ -73,9 +70,12 @@ class desModes():
         desECB=DES.new(self.key, DES.MODE_ECB)   
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
+            if len(block) < blockSize:
+                block = self.padBlock(block)
             dciph=desECB.decrypt(block)
             result.append(dciph)
-        return result
+        # print(desECB.decrypt(plainText))
+        return str(result)
        
 
     def desCBC_Enc(self, plainText, IV):
