@@ -1,7 +1,6 @@
 from Crypto.Cipher import DES
 from keys import keyMAC,keyDES
 import hashlib
-#from des import DesKey
 
 blockSize = 8
 blockMAC = 8
@@ -9,7 +8,8 @@ blockMAC = 8
 def sendMAC(msg):
     obj=DES.new(keyMAC, DES.MODE_ECB)
     padLen = blockMAC - (len(msg) % blockMAC)
-    msg += padLen * 'X'
+    if len(msg) % blockMAC >0 and padLen>0:
+        msg += padLen * '.'
     # encrypt msg with keyMAC
     encryptMACkey=obj.encrypt(msg)
     # hash msg with keyMAC
@@ -20,7 +20,6 @@ class desModes():
     def __init__(self):
         # For testing purposes
         self.key = keyDES
-        #self.key = DesKey(b"some key")
     
     #Split a list into sublists of size blocksize
     def splitMessage(self, plainText):
@@ -28,7 +27,7 @@ class desModes():
     
     def padBlock(self, block):
         padLen = blockSize - (len(block) % blockSize)
-        block += padLen * chr(padLen)
+        block += padLen * '.'
         return block
     
     def stringToBits(self, text):#Convert a string into a list of bits
@@ -55,7 +54,7 @@ class desModes():
         return [x^y for x,y in zip(t1,t2)]
         
     def desECB_Enc(self, plainText):
-        result=b""
+        result=b''
         desECB=DES.new(self.key, DES.MODE_ECB)   
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:

@@ -17,13 +17,9 @@ class client():
         msg = input("Type the message you want to send\n")
         return msg
     def sendMsg(self,msg):
-        #msg = str(msg)
         self.s.sendall(msg)
         return 
 
-    def connectToPort(self, portNum=50000):
-        self.s.connect(('localhost', portNum))
-        return
     
     def closeConn(self):
         self.s.close()
@@ -38,9 +34,9 @@ plainMsg = clien.getMsg()
 print("Message taken from user  "+plainMsg)
 encryptedData = des.desECB_Enc(plainMsg)
 # Display MAC data
-dataMAC = sendMAC(str(plainMsg))
+dataMAC = sendMAC(plainMsg)
 print("MAC to be sent  "+dataMAC)
 
-clien.sendMsg(encryptedData)#+ b' '+ dataMAC.encode("utf-8"))
+clien.sendMsg(encryptedData+ b'_'+ dataMAC.encode("utf-8"))
 # Display the Encypted Data
 print("Message after encryption  "+str(encryptedData))

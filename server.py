@@ -6,47 +6,55 @@ blockSize=8
 
 def checkMAC(msg, MAC):
     calcMAC = sendMAC(msg)
-    print(calcMAC+' '+ MAC)
+    print(calcMAC+' '+ str(MAC))
     return calcMAC == MAC
 class server():
 
     def createConn(self, prtNum=50000):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('localhost', prtNum))
-        s.listen(1)
-        conn, addr = s.accept()
+
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.bind(('localhost', prtNum))
+        self.s.listen(1)
+        self.conn, addr = self.s.accept()
+
+    def sendMsg(self,msg):
+        self.s.sendall(msg)
+        return 
+
+    def recvMsg(self):
         strn=b""
         while 1:
-            data = conn.recv(blockSize)
+            data = self.conn.recv(blockSize)
             if not data:
                 break
-            #conn.sendall(data)
             strn += data
-        conn.close()
-        # MAC = ""
         return strn
+    
+    def closeConn(self):
+        self.s.close()
+        return
 
 
 serv = server()
 des = desModes()
-cipheredMsg = serv.createConn()
-# receieved = str(cipheredMsg).split(" ")
-# try:
-#     MAC = receieved[1]
-# except:
-#     print("Wrong message format")
-msg = cipheredMsg #receieved[0]
+serv.createConn()
+cipheredMsg = serv.recvMsg()
+serv.closeConn()
+
+msg = cipheredMsg[:-33]
+MAC = cipheredMsg[-32:].decode()
 # Display the Encypted Data
 print("Recieved encyprted message  ")
-print(msg)
+print(cipheredMsg)
+# print(MAC)
 # Decrypt the recieved msg
 decryptedMsg = des.desECB_Dec(msg)
-#print(decryptedMsg)
+
 print("\nDecrypted message \n")
 print(decryptedMsg)
-# sendMAC(decryptedMsg)
-# # Check for the MAC
-# if checkMAC(decryptedMsg, MAC):
-#     print("Message is Authenticated")
-# else:
-#     print("Message is NOT Authenticated.\n 3yate")
+sendMAC(decryptedMsg.decode("utf-8"))
+# Check for the MAC
+if checkMAC(decryptedMsg.decode("utf-8"), MAC):
+    print("Message is Authenticated")
+else:
+    print("Message is NOT Authenticated.\n 3yate")
