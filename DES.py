@@ -56,24 +56,23 @@ class desModes():
         
     def desECB_Enc(self, plainText):
         result = list()
-        plainText = self.stringToBits(plainText)
+        #plainText = self.stringToBits(plainText)
         desECB=DES.new(self.key, DES.MODE_ECB)   
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
-            block = self.stringToBits(block)#Convert the block in bit array
+            #block = self.stringToBits(block)#Convert the block in bit array
+            print(block)
             if len(block) < blockSize:
                 block = self.padBlock(block)
             ciph=desECB.encrypt(block)
             result.append(ciph)
-        return result
+        return str(result)
 
     def desECB_Dec(self, plainText):
         result = list()
         desECB=DES.new(self.key, DES.MODE_ECB)   
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
-            if len(block) < blockSize:
-                block = self.padBlock(block)
             dciph=desECB.decrypt(block)
             result.append(dciph)
         return result

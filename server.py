@@ -15,12 +15,13 @@ class server():
         s.bind(('localhost', prtNum))
         s.listen(1)
         conn, addr = s.accept()
+        strn=""
         while 1:
             data = conn.recv(blockSize)
             if not data:
                 break
             #conn.sendall(data)
-            strn = data.decode("utf-8") 
+            strn += data.decode("utf-8") 
         conn.close()
         # MAC = ""
         return strn
@@ -29,17 +30,19 @@ class server():
 serv = server()
 des = desModes()
 cipheredMsg = serv.createConn()
-# Display the Encypted Data
-print(cipheredMsg)
 receieved = cipheredMsg.split(" ")
-
 try:
     MAC = receieved[1]
 except:
     print("Wrong message format")
 msg = receieved[0]
+msg= msg[2:-1]
+# Display the Encypted Data
+print("Recieved encyprted message  "+msg)
 # Decrypt the recieved msg
 decryptedMsg = des.desECB_Dec(msg)
+#print(decryptedMsg)
+print("Decrypted message \n")
 print(decryptedMsg)
 sendMAC(decryptedMsg)
 # Check for the MAC
