@@ -62,34 +62,6 @@ class desModes():
     #print xor_two_str("12ef","abcd")
     
     
-    def desECB_Enc(self, plainText):
-        result = b''
-        desECB = DES3.new(self.key, DES3.MODE_ECB)   
-        cipher = AES.new(self.key, AES.MODE_ECB)
-        textBlocks = self.splitMessage(plainText)
-        for block in textBlocks:
-            print(block)
-            if len(block) < blockSize:
-                block = self.padBlock(block)
-            ciph = cipher.encrypt(block)
-            result += ciph
-            print(ciph)
-        return result
-
-    def desECB_Dec(self, plainText):
-        result = b''
-        #key = get_random_bytes(16)
-        
-        desECB = DES3.new(self.key, DES3.MODE_ECB)   
-        textBlocks = self.splitMessage(plainText)
-        for block in textBlocks:
-            # if len(block) < blockSize:
-            #     block = self.padBlock(block)
-            dciph = desECB.decrypt(block)
-            result += dciph
-        # print(desECB.decrypt(plainText))
-        return result
-       
 
     def desECB_Enc(self, plainText):
         result = b''
