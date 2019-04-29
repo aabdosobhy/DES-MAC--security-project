@@ -2,7 +2,7 @@ from Crypto.Cipher import DES, DES3, AES
 from keys import keyMAC, keyDES
 import hashlib
 
-blockSize = 16
+blockSize = 8
 blockMAC = 8
 # MAC sender data processing
 def sendMAC(msg):
@@ -65,15 +65,15 @@ class desModes():
 
     def desECB_Enc(self, plainText):
         result = b''
-        des3ECB = DES3.new(self.key, DES3.MODE_ECB)  
+        #des3ECB = DES3.new(self.key, DES3.MODE_ECB)  
         desECB = DES.new(self.key, DES.MODE_ECB)  
-        cipher = AES.new(self.key, AES.MODE_ECB)
+        #cipher = AES.new(self.key, AES.MODE_ECB)
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
             print(block)
             if len(block) < blockSize:
                 block = self.padBlock(block)
-            ciph = cipher.encrypt(block)
+            ciph = desECB.encrypt(block)
             result += ciph
             print(ciph)
         return result
@@ -82,19 +82,57 @@ class desModes():
         result = b''
         #key = get_random_bytes(16)
         
-        des3ECB = DES3.new(self.key, DES3.MODE_ECB)  
+        #des3ECB = DES3.new(self.key, DES3.MODE_ECB)  
         desECB = DES.new(self.key, DES.MODE_ECB)  
-        cipher = AES.new(self.key, AES.MODE_ECB)  
+        #cipher = AES.new(self.key, AES.MODE_ECB)  
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
             # if len(block) < blockSize:
             #     block = self.padBlock(block)
-            dciph = cipher.decrypt(block)
+            dciph = desECB.decrypt(block)
             result += dciph
         # print(desECB.decrypt(plainText))
         return result
-    
-    
+   
+    def desCBC_Enc(self, plainText, IV):
+        result = list()
+        desECB = DES.new(self.key, DES.MODE_ECB)        
+        textBlocks = self.splitMessage(plainText)
+        b_no=0
+        for block in textBlocks: #Loop over all the blocks of data               
+            block = self.stringToBits(block)#Convert the block in bit array
+            if len(block) < blockSize:
+                block = self.padBlock(block)
+            if b_no == 0:
+                block = self.xor(IV, block)
+            else:
+                 block = self.xor(result[b_no-1], block)
+            ciph = desECB.encrypt(block)
+            result.append(ciph)
+            b_no += 1
+        return result
+
+    def desCBC_Dec(self, plainText, IV):
+        result = list()
+        desECB=DES.new(self.key, DES.MODE_ECB)        
+        textBlocks = self.splitMessage(plainText)
+        for i in range (0 , len(textBlocks))
+        #for block in textBlocks: #Loop over all the blocks of data
+            block = textBlocks[i]
+            if len(block) < blockSize:
+                block = self.padBlock(block)
+            dciph = desECB.decrypt(block)
+            if i == 0:
+                dciph = self.xor(IV, dciph)
+            else:
+                dciph = self.xor(dciph, textBlocks[i-1])
+            result.append(dciph)
+
+        return result
+               
+                
+                
+                
     def des_CFB_Enc(self):
         #TODO: 
         return
@@ -168,12 +206,3 @@ class desModes():
             count+=1
         return result 
 
-
-if __name__ == '__main__':
-    print(DES3.block_size)
-    text= "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
-    d = desModes()
-    r = d.desECB_Enc(text)
-    #r2 = d.desECB_Dec(r)
-    print("Ciphered: %r" % r)
-    #print("Deciphered: ", r2)
