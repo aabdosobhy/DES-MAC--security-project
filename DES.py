@@ -53,16 +53,55 @@ class desModes():
     #def xor(self, t1, t2):#Apply a xor and return the resulting list
     #    return [x^y for x,y in zip(t1,t2)]
     
-    def change_to_be_hex(str):
-        return int(str, base = 16)
+    def change_to_be_hex(self, str1):
+        return int(str1, base = 16)
 
-    def xor(str1, str2):
-        return hex(int(str1, base = 16) ^ int(str1, base = 16))
-    
-    #print xor_two_str("12ef","abcd")
-    
-    
+    def xor2(self, str1, str2):
+        a = self.change_to_be_hex(str1)
+        b = self.change_to_be_hex(str2)
+        return hex(a ^ b)
+        #return hex(int(str1, base = 16) ^ int(str1, base = 16))
+    def xors(self, a, b):
+        xored = []
+        for i in range(max(len(a), len(b))):
+            xored_value = ord(a[i%len(a)]) ^ ord(b[i%len(b)])
+            xored.append(hex(xored_value)[2:])
+        return ''.join(xored)
 
+    '''
+    # xor operation on two bytes and return the value in two possible forms string or byte
+    #
+    # inputs:
+    #   s1:         first byte can be in bytes or string format 
+    #   s2:         second byte can be in bytes or string format 
+    #   s1Str:      first byte flag 0: byte, 1: string
+    #   s2Str:      second byte flag 0: byte, 1: string
+    #   outFormat:  output result format select 0: byte, 1: string
+    #   
+    # output:
+    #   xor of two bytes in the selected format (bytes or string)
+    #
+    '''
+    def xor(self, s1, s2, s1Str, s2Str, outFormat = 0):
+        if s1Str == 1 :
+            s1 = bytes(s1, 'utf-8')
+        if s2Str == 1 :
+            s2 = bytes(s2, 'utf-8')
+        
+        xorRes = bytes(a ^ b for a, b in zip(s1, s2))
+        if outFormat == 1 :
+            return xorRes.decode('utf-8')
+        else :
+            return xorRes 
+        
+    def incCount (self, count):
+        countstr = str(count)
+        i = len(countstr)
+        comp = ""
+        for j in range (0, 8 - i):
+            comp += "0"
+        return comp + countstr
+        
     def desECB_Enc(self, plainText):
         result = b''
         #des3ECB = DES3.new(self.key, DES3.MODE_ECB)  
@@ -70,13 +109,15 @@ class desModes():
         #cipher = AES.new(self.key, AES.MODE_ECB)
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks:
-            print(block)
+            #print(block)
             if len(block) < blockSize:
                 block = self.padBlock(block)
             ciph = desECB.encrypt(block)
             result += ciph
             print(ciph)
         return result
+    
+
 
     def desECB_Dec(self, plainText):
         result = b''
@@ -95,38 +136,38 @@ class desModes():
         return result
    
     def desCBC_Enc(self, plainText, IV):
-        result = list()
-        desECB = DES.new(self.key, DES.MODE_ECB)        
+        
+        result = b''
+        desECB = DES.new(self.key, DES.MODE_ECB)         
         textBlocks = self.splitMessage(plainText)
-        b_no=0
+        prevFeed = bytes(IV, 'utf-8')
+        b_no = 0
         for block in textBlocks: #Loop over all the blocks of data               
-            block = self.stringToBits(block)#Convert the block in bit array
             if len(block) < blockSize:
                 block = self.padBlock(block)
-            if b_no == 0:
-                block = self.xor(IV, block)
-            else:
-                 block = self.xor(result[b_no-1], block)
+            block = self.xor(prevFeed, block, 0, 1, 0)
             ciph = desECB.encrypt(block)
-            result.append(ciph)
+            print(str(ciph))
+            result += ciph
+            prevFeed = ciph
             b_no += 1
+            print(ciph)
         return result
 
     def desCBC_Dec(self, plainText, IV):
-        result = list()
-        desECB=DES.new(self.key, DES.MODE_ECB)        
+        result = b''
+        desECB = DES.new(self.key, DES.MODE_ECB)        
         textBlocks = self.splitMessage(plainText)
-        for i in range (0 , len(textBlocks))
-        #for block in textBlocks: #Loop over all the blocks of data
+        for i in range (0, len(textBlocks)):
             block = textBlocks[i]
             if len(block) < blockSize:
                 block = self.padBlock(block)
             dciph = desECB.decrypt(block)
             if i == 0:
-                dciph = self.xor(IV, dciph)
+                dciph = self.xor(IV, dciph, 1, 0, 0)
             else:
-                dciph = self.xor(dciph, textBlocks[i-1])
-            result.append(dciph)
+                dciph = self.xor(dciph, textBlocks[i-1], 0, 0, 0)
+            result += dciph
 
         return result
                
@@ -141,68 +182,59 @@ class desModes():
         #TODO: 
         return
     
-    def des_OFB_Enc(self, plainText, Nonce):
+    def desOFB_Enc(self, plainText, Nonce):
         result = b''
-        nonceList = list()
-        Nonce = self.stringToBits(Nonce)
-        nonceList.append(Nonce)
+        nonceCurr = bytes(Nonce, 'utf-8')
         desECB = DES.new(self.key, DES.MODE_ECB)        
         textBlocks = self.splitMessage(plainText)
-        b_no = 1
         for block in textBlocks: #Loop over all the blocks of data               
-            block = self.stringToBits(block)#Convert the block in bit array
             if len(block) < blockSize:
                 block = self.padBlock(block)
-            ciph=desECB.encrypt(nonceList[b_no-1])
-            nonceList.append(ciph)
-            ciph = self.xor(ciph,block)
-            result.append(ciph)
-            b_no += 1
+            ciph = desECB.encrypt(nonceCurr)
+            nonceCurr = ciph            
+            ciph = self.xor(ciph, block, 0, 1, 0)
+            result += ciph
         return result
 
-    def des_OFB_Dec(self, plainText, Nonce):
+    def desOFB_Dec(self, plainText, Nonce):
         result = b''
-        nonceList = list()
-        Nonce = self.stringToBits(Nonce)
-        nonceList.append(Nonce)
+        nonceCurr = bytes(Nonce, 'utf-8')
         desECB = DES.new(self.key, DES.MODE_ECB)        
         textBlocks = self.splitMessage(plainText)
-        b_no = 1
         for block in textBlocks: #Loop over all the blocks of data               
             if len(block) < blockSize:
                 block = self.padBlock(block)
-            dciph=desECB.decrypt(nonceList[b_no -1])
-            nonceList.append(dciph)
-            dciph = self.xor(dciph, block)
-            result.append(dciph)
-            b_no += 1
+            dciph = desECB.encrypt(nonceCurr)
+            nonceCurr = dciph
+            dciph = self.xor(dciph, block, 0, 0, 0)
+            result += dciph
         return result
     
     
-    def des_CNT_Enc(self, plainText, count=0):
+    def desCNT_Enc(self, plainText, count =0):
         result = b''
         desECB = DES.new(self.key, DES.MODE_ECB)        
         textBlocks = self.splitMessage(plainText)
         for block in textBlocks: #Loop over all the blocks of data               
-            block = self.stringToBits(block)#Convert the block in bit array
             if len(block) < blockSize:
                 block = self.padBlock(block)
-            ciph=desECB.encrypt(count)
-            ciph = self.xor(ciph,block)
-            result.append(ciph)
-            count+=1
-        return result 
+            countCurr = self.incCount(count)
+            ciph = desECB.encrypt(countCurr)
+            ciph = self.xor(ciph, block, 0, 1, 0)
+            result += ciph
+            count += 1
+        return result
     
-    def des_CNT_Dec(self, plainText, count=0):
+    def desCNT_Dec(self, plainText, count =0):
         result = b''
         desECB = DES.new(self.key, DES.MODE_ECB)        
         textBlocks = self.splitMessage(plainText)
-        for block in textBlocks: #Loop over all the blocks of data               
-            if len(block) < blockSize:
-                block = self.padBlock(block)
-            dciph = desECB.decrypt(count)
-            dciph = self.xor(dciph, block)
-            result.append(dciph)
-            count+=1
-        return result 
+        for block in textBlocks: #Loop over all the blocks of data 
+            countCurr = self.incCount(count)              
+            dciph = desECB.encrypt(countCurr)
+            dciph = self.xor(dciph, block, 0, 0, 0)
+            result += dciph
+            count += 1
+        return result
+
 
