@@ -236,5 +236,3 @@ class desModes():
             result += dciph
             count += 1
         return result
-
-
