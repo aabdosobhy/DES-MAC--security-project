@@ -48,12 +48,10 @@ print("DES mode used is " + mode + ".")
 # Display the Encypted Data
 print("Recieved encyprted message  ")
 print(cipheredMsg)
-# print(MAC)
 # Decrypt the recieved msg
 decryptedMsg = des.decMode(msg, mode)
 
-print("\nDecrypted message \n")
-print(decryptedMsg)
+print("\nDecrypted message \n"+ str(decryptedMsg))
 sendMAC(decryptedMsg.decode("utf-8"))
 # Check for the MAC
 if checkMAC(decryptedMsg.decode("utf-8"), MAC):

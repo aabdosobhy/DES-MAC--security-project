@@ -1,5 +1,5 @@
 from Crypto.Cipher import DES
-from keys import keyMAC, keyDES
+from keys import keyMAC, keyDES, IV, Nonce
 import hashlib
 
 blockSize = 8
@@ -21,8 +21,9 @@ def sendMAC(msg):
 class desModes():
     modes = {"1":"ECB", "2":"CBC", "3":"CFB", "4":"OFB", "5":"CNT"}
     def __init__(self):
-        # For testing purposes
         self.key = keyDES
+        self.iv = IV
+        self.nonce = Nonce
     
     #Split a list into sublists of size blocksize
     def splitMessage(self, plainText, bkSize = blockSize):
@@ -207,18 +208,14 @@ class desModes():
         if(mode == "ECB" ):
             encryptedMsg = self.desECB_Enc(plainMsg)
         elif(mode == "CBC" ):
-            IV=""
-            encryptedMsg = self.desCBC_Enc(plainMsg, IV)
+            encryptedMsg = self.desCBC_Enc(plainMsg, self.iv)
         elif(mode == "CFB" ):
-            IV=""
-            s=""
-            encryptedMsg = self.desCFB_Enc(plainMsg,IV,s)
+            s=blockSize
+            encryptedMsg = self.desCFB_Enc(plainMsg, self.iv,s)
         elif(mode == "OFB" ):
-            nonce=""
-            encryptedMsg = self.desOFB_Enc(plainMsg,nonce)
+            encryptedMsg = self.desOFB_Enc(plainMsg, self.nonce)
         elif(mode == "CNT" ):
-            count=""
-            encryptedMsg = self.desCNT_Enc(plainMsg,count)
+            encryptedMsg = self.desCNT_Enc(plainMsg)
         else:
             print ("Your choice is invalid")
             return  b'-1'
@@ -228,19 +225,12 @@ class desModes():
         if(mode == "ECB" ):
             decryptedMsg = self.desECB_Dec(cipheredMsg,)
         elif(mode == "CBC" ):
-            IV=""
-            decryptedMsg = self.desCBC_Dec(cipheredMsg, IV)
+            decryptedMsg = self.desCBC_Dec(cipheredMsg, self.iv)
         elif(mode == "CFB" ):
-            IV=""
-            s=""
-            decryptedMsg = self.desCFB_Dec(cipheredMsg,IV,s)
+            s=blockSize
+            decryptedMsg = self.desCFB_Dec(cipheredMsg, self.iv,s)
         elif(mode == "OFB" ):
-            nonce=""
-            decryptedMsg = self.desOFB_Dec(cipheredMsg,nonce)
+            decryptedMsg = self.desOFB_Dec(cipheredMsg,self.nonce)
         elif(mode == "CNT" ):
-            count=""
-            decryptedMsg = self.desCNT_Dec(cipheredMsg,count)
-        # else:
-        #     print ("Your choice is invalid")
-        #     return  b'-1'
+            decryptedMsg = self.desCNT_Dec(cipheredMsg)
         return decryptedMsg
