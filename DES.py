@@ -64,7 +64,7 @@ class desModes():
                 block = self.padBlock(block)
             ciph = desECB.encrypt(block)
             result += ciph
-            print(ciph)
+            # print(ciph)
         return result
 
     def desECB_Dec(self, plainText):
@@ -77,7 +77,7 @@ class desModes():
             result += dciph
         return result
 
-    def desCBC_Enc(self, plainText, IV):
+    def desCBC_Enc(self, plainText, IV=IV):
         result = b''
         desECB = DES.new(self.key, DES.MODE_ECB)         
         textBlocks = self.splitMessage(plainText)
@@ -94,7 +94,7 @@ class desModes():
             print(ciph)
         return result
 
-    def desCBC_Dec(self, plainText, IV):
+    def desCBC_Dec(self, plainText, IV=IV):
         result = b''
         desECB = DES.new(self.key, DES.MODE_ECB)        
         textBlocks = self.splitMessage(plainText)
@@ -111,7 +111,7 @@ class desModes():
             result += dciph
         return result
 
-    def desCFB_Enc(self, plainText, IV, S):
+    def desCFB_Enc(self, plainText, IV=IV, S=blockSize):
         result = b''
         IV = bytes(IV, 'utf-8')
         desECB = DES.new(self.key, DES.MODE_ECB)
@@ -128,7 +128,7 @@ class desModes():
             result += block 
         return result
 
-    def desCFB_Dec(self, plainText, IV, S):
+    def desCFB_Dec(self, plainText, IV= IV, S=blockSize):
         result = b''
         IV = bytes(IV, 'utf-8')
         desECB = DES.new(self.key, DES.MODE_ECB)
@@ -142,7 +142,7 @@ class desModes():
             result += block
         return result
 
-    def desOFB_Enc(self, plainText, Nonce):
+    def desOFB_Enc(self, plainText, Nonce=Nonce):
         result = b''
         nonceCurr = bytes(Nonce, 'utf-8')
         desECB = DES.new(self.key, DES.MODE_ECB)        
@@ -157,7 +157,7 @@ class desModes():
             result += ciph
         return result
 
-    def desOFB_Dec(self, plainText, Nonce):
+    def desOFB_Dec(self, plainText, Nonce=Nonce):
         result = b''
         nonceCurr = bytes(Nonce, 'utf-8')
         desECB = DES.new(self.key, DES.MODE_ECB)        
@@ -200,9 +200,9 @@ class desModes():
             count += 1
         return result
 
-    def chooseEncMode(self, plainMsg):
-        print ("Enter 1 fot ECB, 2 for CBC, 3 for CFB, 4 for OFB, 5 for CNT")
-        modeNum = input("Choose DES mode number:\n")
+    def chooseEncMode(self, plainMsg, modeNum):
+        # print ("Enter 1 fot ECB, 2 for CBC, 3 for CFB, 4 for OFB, 5 for CNT")
+        # modeNum = input("Choose DES mode number:\n")
         mode = desModes.modes[modeNum]
         print("You chose " + mode + " mode.")
         if(mode == "ECB" ):
@@ -221,7 +221,8 @@ class desModes():
             return  b'-1'
         return encryptedMsg, modeNum
 
-    def decMode(self, cipheredMsg, mode):
+    def decMode(self, cipheredMsg, modeNum):
+        mode = desModes.modes[modeNum]
         if(mode == "ECB" ):
             decryptedMsg = self.desECB_Dec(cipheredMsg,)
         elif(mode == "CBC" ):
@@ -234,3 +235,14 @@ class desModes():
         elif(mode == "CNT" ):
             decryptedMsg = self.desCNT_Dec(cipheredMsg)
         return decryptedMsg
+
+
+if __name__ == "__main__":
+    text= "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    d = desModes()
+    while (blockSize<8*16):
+        r, t = d.chooseEncMode(text, "1")
+        print("Ciphered: %r" % str(r))
+        dec = d.decMode(r,"1")
+        print("Deciphered: ", dec)
+        blockSize+=8

@@ -36,11 +36,10 @@ class server():
 
 
 serv = server()
-des = desModes()
 serv.createConn()
+# while (1):
+des = desModes()
 cipheredMsg = serv.recvMsg()
-serv.closeConn()
-
 msg = cipheredMsg[:-33]
 MAC = cipheredMsg[-33:-1].decode()
 mode = desModes.modes[cipheredMsg[-1:].decode()]
@@ -58,3 +57,8 @@ if checkMAC(decryptedMsg.decode("utf-8"), MAC):
     print("Message is Authenticated")
 else:
     print("Message is NOT Authenticated.\n 3yate")
+
+    # closeSer = input("Type c to close server\n")
+    # if closeSer==b'c':
+    #     serv.closeConn()
+    #     break
