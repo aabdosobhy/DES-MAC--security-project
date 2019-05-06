@@ -19,6 +19,7 @@ def sendMAC(msg):
     return hashedMAC
 
 class desModes():
+    modes = {"1":"ECB", "2":"CBC", "3":"CFB", "4":"OFB", "5":"CNT"}
     def __init__(self):
         # For testing purposes
         self.key = keyDES
@@ -31,47 +32,7 @@ class desModes():
         padLen = bkSize - (len(block) % bkSize)
         block += padLen * '.'
         return block
-    
-    def stringToBits(self, text):#Convert a string into a list of bits
-        array = list()
-        for char in text:
-            binval = self.binvalue(char, 8)#Get the char value on one byte
-            array.extend([int(x) for x in list(binval)]) #Add the bits to the final list
-        return array
 
-    def bitsToString(self, array): #Recreate the string from the bit array
-        res = ''.join([chr(int(y , 2)) for y in 
-            [''.join([str(x) for x in _bytes]) for _bytes in  self.splitMessage(array)]])   
-        return res
-    
-    def binvalue(self, val, bitsize): #Return the binary value as a string of the given size 
-        binval = bin(val)[2 : ] if isinstance(val, int) else bin(ord(val))[2 : ]
-        if len(binval) > bitsize:
-            raise "binary value larger than the expected size"
-        while len(binval) < bitsize:
-            binval = "0" + binval #Add as many 0 as needed to get the wanted size
-        return binval
-    
-    #def xor(self, t1, t2):#Apply a xor and return the resulting list
-    #    return [x^y for x,y in zip(t1,t2)]
-    
-    def change_to_be_hex(self, str1):
-        return int(str1, base = 16)
-
-    '''
-    # xor operation on two bytes and return the value in two possible forms string or byte
-    #
-    # inputs:
-    #   s1:         first byte can be in bytes or string format 
-    #   s2:         second byte can be in bytes or string format 
-    #   s1Str:      first byte flag 0: byte, 1: string
-    #   s2Str:      second byte flag 0: byte, 1: string
-    #   outFormat:  output result format select 0: byte, 1: string
-    #   
-    # output:
-    #   xor of two bytes in the selected format (bytes or string)
-    #
-    '''
     def xor(self, s1, s2, s1Str, s2Str, outFormat = 0):
         if s1Str == 1:
             s1 = bytes(s1, 'utf-8')
@@ -237,3 +198,49 @@ class desModes():
             result += dciph
             count += 1
         return result
+
+    def chooseEncMode(self, plainMsg):
+        print ("Enter 1 fot ECB, 2 for CBC, 3 for CFB, 4 for OFB, 5 for CNT")
+        modeNum = input("Choose DES mode number:\n")
+        mode = desModes.modes[modeNum]
+        print("You chose " + mode + " mode.")
+        if(mode == "ECB" ):
+            encryptedMsg = self.desECB_Enc(plainMsg)
+        elif(mode == "CBC" ):
+            IV=""
+            encryptedMsg = self.desCBC_Enc(plainMsg, IV)
+        elif(mode == "CFB" ):
+            IV=""
+            s=""
+            encryptedMsg = self.desCFB_Enc(plainMsg,IV,s)
+        elif(mode == "OFB" ):
+            nonce=""
+            encryptedMsg = self.desOFB_Enc(plainMsg,nonce)
+        elif(mode == "CNT" ):
+            count=""
+            encryptedMsg = self.desCNT_Enc(plainMsg,count)
+        else:
+            print ("Your choice is invalid")
+            return  b'-1'
+        return encryptedMsg, modeNum
+
+    def decMode(self, cipheredMsg, mode):
+        if(mode == "ECB" ):
+            decryptedMsg = self.desECB_Dec(cipheredMsg,)
+        elif(mode == "CBC" ):
+            IV=""
+            decryptedMsg = self.desCBC_Dec(cipheredMsg, IV)
+        elif(mode == "CFB" ):
+            IV=""
+            s=""
+            decryptedMsg = self.desCFB_Dec(cipheredMsg,IV,s)
+        elif(mode == "OFB" ):
+            nonce=""
+            decryptedMsg = self.desOFB_Dec(cipheredMsg,nonce)
+        elif(mode == "CNT" ):
+            count=""
+            decryptedMsg = self.desCNT_Dec(cipheredMsg,count)
+        # else:
+        #     print ("Your choice is invalid")
+        #     return  b'-1'
+        return decryptedMsg

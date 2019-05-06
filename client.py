@@ -13,14 +13,14 @@ class client():
         return
     
     # Read plain text from user
-    def getMsg(self):
+    def getMsgFromUser(self):
         msg = input("Type the message you want to send\n")
         return msg
+
     def sendMsg(self,msg):
         self.s.sendall(msg)
-        return 
+        return
 
-    
     def closeConn(self):
         self.s.close()
         return
@@ -28,15 +28,16 @@ class client():
 
 clien = client()
 des = desModes()
-#clien.connectToPort()
-plainMsg = clien.getMsg()
+
+plainMsg = clien.getMsgFromUser()
 # Display plaintext msg inputed from user
-print("Message taken from user  "+plainMsg)
-encryptedData = des.desECB_Enc(plainMsg)
+print("Message taken from user  " + plainMsg)
+
+encryptedData, modeNum = des.chooseEncMode(plainMsg)
 # Display MAC data
 dataMAC = sendMAC(plainMsg)
-print("MAC to be sent  "+dataMAC)
+print("MAC to be sent  " + dataMAC)
 
-clien.sendMsg(encryptedData+ b'_'+ dataMAC.encode("utf-8"))
+clien.sendMsg(encryptedData + dataMAC.encode("utf-8") + str(modeNum).encode("utf-8"))
 # Display the Encypted Data
-print("Message after encryption  "+str(encryptedData))
+print("Message after encryption  " + str(encryptedData))

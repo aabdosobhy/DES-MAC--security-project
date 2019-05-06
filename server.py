@@ -42,13 +42,15 @@ cipheredMsg = serv.recvMsg()
 serv.closeConn()
 
 msg = cipheredMsg[:-33]
-MAC = cipheredMsg[-32:].decode()
+MAC = cipheredMsg[-33:-1].decode()
+mode = desModes.modes[cipheredMsg[-1:].decode()]
+print("DES mode used is " + mode + ".")
 # Display the Encypted Data
 print("Recieved encyprted message  ")
 print(cipheredMsg)
 # print(MAC)
 # Decrypt the recieved msg
-decryptedMsg = des.desECB_Dec(msg)
+decryptedMsg = des.decMode(msg, mode)
 
 print("\nDecrypted message \n")
 print(decryptedMsg)
