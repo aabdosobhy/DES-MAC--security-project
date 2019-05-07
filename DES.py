@@ -1,6 +1,7 @@
 from Crypto.Cipher import DES
 from keys import keyMAC, keyDES, IV, Nonce
 import hashlib
+import time
 
 blockSize = 8
 blockMAC = 8
@@ -200,9 +201,9 @@ class desModes():
             count += 1
         return result
 
-    def chooseEncMode(self, plainMsg):
-        print ("Enter 1 fot ECB, 2 for CBC, 3 for CFB, 4 for OFB, 5 for CNT")
-        modeNum = input("Choose DES mode number:\n")
+    def chooseEncMode(self, plainMsg, modeNum):
+        # print ("Enter 1 fot ECB, 2 for CBC, 3 for CFB, 4 for OFB, 5 for CNT")
+        # modeNum = input("Choose DES mode number:\n")
         mode = desModes.modes[modeNum]
         print("You chose " + mode + " mode.")
         if(mode == "ECB" ):
@@ -221,7 +222,8 @@ class desModes():
             return  b'-1'
         return encryptedMsg, modeNum
 
-    def decMode(self, cipheredMsg, mode):
+    def decMode(self, cipheredMsg, modeNum):
+        mode = desModes.modes[modeNum]
         if(mode == "ECB" ):
             decryptedMsg = self.desECB_Dec(cipheredMsg,)
         elif(mode == "CBC" ):
@@ -234,3 +236,23 @@ class desModes():
         elif(mode == "CNT" ):
             decryptedMsg = self.desCNT_Dec(cipheredMsg)
         return decryptedMsg
+
+if __name__ == "__main__":
+    text= "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    d = desModes()
+    encT = []
+    decT = []
+    for i in range(1,6):
+        start = time.time()
+        r, t = d.chooseEncMode(text, str(i))
+        end = time.time()
+        encT.append(end-start)
+        print("Ciphered: %r" % str(r))
+        start = time.time()
+        dec = d.decMode(r,str(i))
+        end = time.time()
+        decT.append(end-start)
+        print("Deciphered: ", dec)
+    
+    print(encT)
+    print(decT)
